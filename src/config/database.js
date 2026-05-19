@@ -1,33 +1,23 @@
-const { Sequelize } = require('sequelize');
-require('dotenv').config(); // Carrega as variáveis do .env
+const { Pool } = require('pg');
+require('dotenv').config();
 
-if (!process.env.DATABASE_URL) {
-  console.error("❌ ERRO: DATABASE_URL não encontrada no arquivo .env");
-  process.exit(1);
-}
-
-// Cria a instância de conexão com o banco de dados
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: 'postgres',
-  logging: false, // Mude para console.log se quiser ver as queries SQL no terminal
-  
-  // Esta configuração é OBRIGATÓRIA para bancos na nuvem como o NeonDB
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false 
-    }
-  }
+const pool = new Pool({
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME || 'resume_db',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || '',
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
-// Testa a conexão apenas para garantir que está tudo certo
-sequelize.authenticate()
-  .then(() => {
-    console.log('✅ Conexão com o banco de dados estabelecida com sucesso!');
-  })
-  .catch((error) => {
-    console.error('❌ Não foi possível conectar ao banco de dados:', error);
-  });
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle client', err);
+  process.exit(-1);
+});
 
-// Exporta a instância para ser usada pelos Models
-module.exports = sequelize;
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+  pool,
+};
