@@ -1,7 +1,7 @@
 /**
- * Factory that returns a full CRUD controller for any resume sub-entity.
- * @param {string} table     - DB table name
- * @param {string[]} fields  - Allowed writable fields (used for INSERT/UPDATE)
+ *
+ * @param {string} table     
+ * @param {string[]} fields  
  */
 const db = require('../config/database');
 

@@ -1,6 +1,6 @@
 const db = require('../config/database');
 
-// GET /resumes  (public only)
+// GET /resumes  (publico)
 const getAll = async (req, res, next) => {
   try {
     const { rows } = await db.query(
@@ -14,7 +14,7 @@ const getAll = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-// GET /resumes/:id  (full resume with all sections)
+// GET /resumes/:id
 const getById = async (req, res, next) => {
   try {
     const id = req.params.id;
